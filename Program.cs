@@ -8,8 +8,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -44,7 +46,9 @@ builder.Services.AddAuthentication(options=>
     options.DefaultChallengeScheme=JwtBearerDefaults.AuthenticationScheme;
 
 }).AddJwtBearer(options=>
-{
+{   
+    options.SaveToken = true;
+    options.RequireHttpsMetadata= false;
     options.TokenValidationParameters=new TokenValidationParameters(){
         ValidateActor=true,
         ValidateIssuer=true,

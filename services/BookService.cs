@@ -4,16 +4,19 @@ using dotnet2.dto;
 using dotnet2.models;
 using dotnet2.data;
 using Mapster;
+using AutoMapper;
 //without mapster
-
+// commented codes are autoMapper method;
   namespace dotnet2.services;
 
     public class BookService : IBookService
     {
         private readonly ApplicationDbContext _dbContext;
+        private readonly IMapper _mapper ;
 
-        public BookService(ApplicationDbContext dbContext){
+        public BookService(ApplicationDbContext dbContext,IMapper mapper){
             _dbContext = dbContext;
+            _mapper = mapper;
          }
 
      
@@ -39,6 +42,7 @@ using Mapster;
             bookName = book.bookName,
             author = book.author
         });
+        // var bookDtos = books.Select(book=>_mapper.Map<BookDto>(book));
             return bookDtos;
         }
 
@@ -52,6 +56,7 @@ using Mapster;
                    bookName = book.bookName,
                    author = book.author
                  };
+            // var bookDto = _mapper.Map<BookDto>(book);
                 return bookDto;
             }
                  throw new Exception("book is not found");
@@ -63,6 +68,7 @@ using Mapster;
                 bookName=addBookDto.bookName,
                 author=addBookDto.author
             };
+            // var book = _mapper.Map<Books>(addBookDto);
 
             _dbContext.books.Add(book);
             await _dbContext.SaveChangesAsync();
@@ -71,6 +77,7 @@ using Mapster;
                 bookName= book.bookName,
                 author=book.author
             };
+            // var bookDto = _mapper.Map<BookDto>(book);
             return bookDto;
         }
 
@@ -80,9 +87,9 @@ using Mapster;
             if(book == null){
                 throw new Exception("book is not found");
             }
-            
             book.bookName= updateBookDto.bookName;
             book.author= updateBookDto.author;
+            // _mapper.Map(updateBookDto, book);
             await _dbContext.SaveChangesAsync();
             var bookDto = new BookDto
         {
@@ -91,6 +98,7 @@ using Mapster;
             author = book.author,
            
         };
+            // var bookDto = _mapper.Map<BookDto>(book);
             return bookDto;
         }
     

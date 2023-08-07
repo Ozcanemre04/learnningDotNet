@@ -6,5 +6,6 @@ namespace dotnet2.dto
     {
         public required string message { get; set; }
         public string? accessToken { get; set; }
+        
     }
 }

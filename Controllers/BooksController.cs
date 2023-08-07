@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using dotnet2.dto;
 using Mapster;
 using dotnet2.models;
+using dotnet2.validator;
 using dotnet2.services;
 
 namespace dotnet2.Controllers
@@ -48,8 +49,10 @@ namespace dotnet2.Controllers
 
          [HttpPost]
          public async Task<ActionResult<BookDto>> Create([FromBody] AddBookDto addBookDto){
-            if(!ModelState.IsValid){
-                return BadRequest(ModelState);
+            var validator = new BookValidator();
+            var validationResult = await validator.ValidateAsync(addBookDto);
+            if(!validationResult.IsValid){
+                return BadRequest(validationResult.Errors);
             }
              var book = await _bookService.CreateBook(addBookDto);
              return CreatedAtAction(nameof(GetById), new {id = book.Id},book);

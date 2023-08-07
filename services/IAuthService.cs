@@ -8,5 +8,8 @@ namespace dotnet2.services
         Task<RegisterResponseDto> Register(RegisterDto registerDto);
         Task<AuthResponseDto> Login(LoginDto loginDto);
 
+        Task<string> refreshToken();
+        Task<string> logout();
+
     }
 }

@@ -10,5 +10,6 @@ namespace dotnet2.models
         public string? lastName { get; set;}
 
         public UserAdress? UserAdress {get; set;}
+        public RefreshToken? RefreshToken {get; set;}
     }
 }

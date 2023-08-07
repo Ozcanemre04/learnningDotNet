@@ -1,5 +1,5 @@
 
-
+using dotnet2.dto;
 namespace dotnet2.dto
 {
     public class ProfileDto
@@ -10,10 +10,9 @@ namespace dotnet2.dto
         public  string? UserName { get; set; }
         public  string? firstName {get;set;}
         public  string? lastName {get;set;}
-        public string? Address { get; set; }
-        public string? City { get; set; }
-        public string? State { get; set; }
-        public string? Country { get; set; }
+      
+        public AdressDto? Adress{ get; set; }
+
        
     }
 }

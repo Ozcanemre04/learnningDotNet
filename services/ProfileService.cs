@@ -48,10 +48,12 @@ namespace dotnet2.services
                    lastName=user?.lastName,
                    Email=user?.Email,
                    UserName=user?.UserName,
-                   State = profile?.State,
-                   Country = profile?.Country,
-                   City = profile?.City,
-                   Address = profile?.Address,  
+                   Adress= new AdressDto {
+                   State = profile.State,
+                   Country = profile.Country,
+                   City = profile.City,
+                   Address = profile.Address,  
+                   } 
             };
             return profileDto;
         }
@@ -62,19 +64,21 @@ namespace dotnet2.services
             var UserId =  currentUser();
             if(UserId is not null){
             var user  = await _userManager.FindByIdAsync(UserId);
-            var useradress = await _dbcontext.Adress.SingleOrDefaultAsync(x=>x.UserId == UserId);
+            var useradress = await _dbcontext.Adress.Include(a=>a.ApplicationUser).SingleOrDefaultAsync(x=>x.UserId == UserId);
             var userDto = new ProfileDto 
                  {
                    message= "success",
-                   UserId = user?.Id,
-                   firstName=user?.firstName,
-                   lastName=user?.lastName,
-                   Email=user?.Email,
-                   UserName=user?.UserName,
+                   UserId = user.Id,
+                   firstName=user.firstName,
+                   lastName=user.lastName,
+                   Email=user.Email,
+                   UserName=user.UserName,
+                   Adress= new AdressDto {
                    State = useradress?.State,
                    Country = useradress?.Country,
                    City = useradress?.City,
                    Address = useradress?.Address,  
+                   }
                  };
             return userDto;
 
@@ -88,30 +92,41 @@ namespace dotnet2.services
         {
             var userId = currentUser();
             var user  = await _userManager.FindByIdAsync(userId);
-            var useradress = await _dbcontext.Adress.SingleOrDefaultAsync(x=>x.UserId == userId);
+            var useradress = await _dbcontext.Adress.Include(a=>a.ApplicationUser).SingleOrDefaultAsync(x=>x.UserId == userId);
             if(useradress is null) {
+                user.firstName = updateProfile.firstName;
+                user.lastName = updateProfile.lastName;
+                await _userManager.UpdateAsync(user);
+
                 return new ProfileDto{
-                    message="user address doesnt exist"
+                   message="user updated but user address doesnt exist",
+                   UserId = user.Id,
+                   firstName=user.firstName,
+                   lastName=user.lastName,
+                   Email=user.Email,
+                   UserName=user.UserName,  
                 };
             }
-            user.firstName = updateProfile.firstName;
-            user.lastName = updateProfile.lastName;
-            useradress.Country = updateProfile.Country;
-            useradress.City = updateProfile.City;
-            useradress.State = updateProfile.State;
-            useradress.Address = updateProfile.Address;
+            useradress.ApplicationUser.firstName = updateProfile.firstName;
+            useradress.ApplicationUser.lastName = updateProfile.lastName;
+            useradress.Country = updateProfile.Adress.Country;
+            useradress.City = updateProfile.Adress.City;
+            useradress.State = updateProfile.Adress.State;
+            useradress.Address = updateProfile.Adress.Address;
             await _dbcontext.SaveChangesAsync();
             var profileDto = new ProfileDto {
-                   message= "success,User upated",
-                   UserId = user?.Id,
-                   firstName=user?.firstName,
-                   lastName=user?.lastName,
-                   Email=user?.Email,
-                   UserName=user?.UserName,
+                   message= "success,User and user adress are upated",
+                   UserId = useradress.ApplicationUser.Id,
+                   firstName=useradress.ApplicationUser.firstName,
+                   lastName=useradress.ApplicationUser.lastName,
+                   Email=useradress.ApplicationUser.Email,
+                   UserName=useradress.ApplicationUser.UserName,
+                   Adress= new AdressDto {
                    State = useradress?.State,
                    Country = useradress?.Country,
                    City = useradress?.City,
                    Address = useradress?.Address,  
+                   }
             };
             return profileDto;
         }
