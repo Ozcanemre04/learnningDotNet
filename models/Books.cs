@@ -1,9 +1,12 @@
+using System.Xml;
 
 
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace dotnet2.models
-{
+{ 
+    [Table("books")]
     public class Books
     {   
         [Key]

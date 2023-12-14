@@ -105,6 +105,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+await using var scope = app.Services.CreateAsyncScope();
+using var db = scope.ServiceProvider.GetService<ApplicationDbContext>();
+await db.Database.MigrateAsync();
+
 
 
 app.UseHttpsRedirection();

@@ -74,7 +74,6 @@ namespace dotnet2.services
         public async Task<AuthResponseDto> Login(LoginDto loginDto)
         {
             var identity = await _userManager.FindByEmailAsync(loginDto.Email);
-            var refresh = await _dbContext.RefreshToken.FirstOrDefaultAsync(x=>x.UserId == identity.Id);
             if(identity is null){
                 return new AuthResponseDto(){
                     message="user doesnt exist"
@@ -87,10 +86,11 @@ namespace dotnet2.services
                 };
               };
     
-          if(identity.RefreshToken != null ){
+            var refresh = await _dbContext.RefreshToken.FirstOrDefaultAsync(x=>x.UserId == identity.Id);
+          if(refresh != null ){
             var token0 = GenerateToken(identity);
             
-            refresh.refreshToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(100));
+            refresh!.refreshToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(100));
             refresh.expires = DateTime.Now.AddDays(7);
             await _dbContext.SaveChangesAsync();
             SetRefreshToken(refresh);
@@ -181,7 +181,7 @@ namespace dotnet2.services
 
             var securityToken = new JwtSecurityToken(
                 claims:claims,
-                expires:DateTime.Now.AddMinutes(1),
+                expires:DateTime.Now.AddMinutes(300),
                 issuer:_config.GetSection("JWT:Issuer").Value,
                 audience:_config.GetSection("JWT:Audience").Value,
                 signingCredentials:signingCred);

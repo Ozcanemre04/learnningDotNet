@@ -1,0 +1,41 @@
+# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP.NET Core service.
+
+version: '3.4'
+networks:
+  dev:
+    driver: bridge
+services:
+  dotnet2:
+     image: dotnet2
+     depends_on:
+       - "dotnet2_db"
+     container_name: "dotnet2-services"
+     ports:
+       - "8088:80"
+     build:
+       context: .
+       dockerfile: Dockerfile
+     environment:
+       - ConnectionStrings__DefaultConnection=${ConnectionStrings__DefaultConnection}
+       - JWT__Key=${JWT__Key} 
+       - JWT__Issuer=${JWT__Issuer}
+       - JWT__Audience=${JWT__Audience}
+       - ASPNETCORE_URLS=${ASPNETCORE_URLS}
+     networks:
+       - dev
+  dotnet2_db:
+     image: postgres:12.17
+     container_name: dotnet2_db
+     environment:
+       - POSTGRES_USER=${POSTGRES_USER}
+       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+       - POSTGRES_DB=${POSTGRES_DB}
+     ports:
+       - "5432:5432"
+     restart: always
+     volumes:
+       - dotnet2_data:/var/lib/postgresql/data/
+     networks:
+       - dev
+volumes:
+  dotnet2_data: {}
